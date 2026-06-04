@@ -1,2 +1,0 @@
-Sum: 7
-Product: 10
