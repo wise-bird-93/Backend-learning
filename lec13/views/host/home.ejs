@@ -1,0 +1,112 @@
+<%- include('../partials/head') %>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <main class="container mx-auto p-8 mt-10 max-w-6xl">
+      <h2 class="text-3xl text-red-500 font-bold text-center mb-6">
+        Registered homes:
+      </h2>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <% registeredHomes.forEach(home => { %>
+
+<div class="flex bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 h-72">
+
+    <!-- Image -->
+    <div class="w-[38%]">
+        <img
+            src="<%= home.photoURL %>"
+            alt="<%= home.houseName %>"
+            class="w-full h-full object-cover"
+        >
+    </div>
+
+    <!-- Details -->
+    <div class="flex-1 p-6 flex flex-col justify-between">
+
+        <!-- Top -->
+        <div>
+
+            <div class="flex justify-between items-start">
+
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900">
+                        <%= home.houseName %>
+                    </h2>
+
+                    <p class="text-gray-500 mt-2 text-lg">
+                        📍 <%= home.location %>
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-1 bg-red-50 px-3 py-1 rounded-full">
+
+                    <span class="text-yellow-500">★</span>
+
+                    <span class="font-semibold text-gray-800">
+                        <%= home['rating'] %>/10
+                    </span>
+
+                </div>
+
+            </div>
+
+            <hr class="my-5">
+
+            <p class="text-gray-500 leading-7">
+                Experience a peaceful stay with modern interiors,
+                spacious rooms, and a beautiful atmosphere perfect
+                for vacations and weekend getaways.
+            </p>
+
+        </div>
+
+        <!-- Bottom -->
+
+        <div class="flex justify-between items-center">
+
+            <div>
+
+                <p class="text-gray-400 text-sm">
+                    Starting from
+                </p>
+
+                <h3 class="text-4xl font-extrabold text-red-500">
+                    ₹<%= home['price'] %>
+                </h3>
+
+                <p class="text-gray-400 text-sm">
+                    per night
+                </p>
+
+            </div>
+
+            <div>
+                <form action="/bookings/add" method="POST">
+                    <input type="hidden" name="homeId" value="<%= home.id %>">
+
+                    <button
+                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold transition duration-200">
+                        Book
+                    </button>
+                </form><br>
+                <form action="/favourites/add" method="POST">
+                    <input type="hidden" name="homeId" value="<%= home.id %>">
+
+                    <button
+                        type="submit" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold transition duration-200">
+                        Add to Favourites
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<% }) %>
+      </div>
+    </main>
+  </body>
+</html>
