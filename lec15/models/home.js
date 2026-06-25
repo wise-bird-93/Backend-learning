@@ -1,8 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-const routePath = require('../utils/pathUtil');
-
-const homeDataPath = path.join(routePath, 'data', 'homes.json');
+const db = require("../utils/dataBaseUtil");
 
 module.exports = class Home {
 
@@ -17,42 +13,31 @@ module.exports = class Home {
     }
 
     save() {
-
-        Home.fetchAll(registeredHomes => {
-
-            registeredHomes.push(this);
-
-            fs.writeFile(
-                homeDataPath,
-                JSON.stringify(registeredHomes),
-                err => console.log(err)
-            );
-
-        });
-
+        return db.execute(
+            "INSERT INTO homes(id, houseName, description, price, location, rating, photoURL) VALUES(?,?,?,?,?,?,?)",[
+                this.id, this.houseName, this.description, this.price, this.location, this.rating, this.photoURL
+            ]
+        )
     }
 
-    static fetchAll(callback) {
-
-        fs.readFile(homeDataPath, (err, data) => {
-
-            if (!err)
-                callback(JSON.parse(data));
-            else
-                callback([]);
-
-        });
-
+    static fetchAll() {
+        return db.execute('SELECT * FROM homes');
     }
 
-    static saveAll(registeredHomes) {
-        fs.writeFile(homeDataPath, JSON.stringify(registeredHomes), err => console.log(err));
+    static findById(homeId){
+        return db.execute("SELECT * FROM homes WHERE id=?",[homeId]);
     }
 
     static delete(homeId) {
-        Home.fetchAll(homes => {
-            const home = homes.filter(h => h.id != homeId);
-            Home.saveAll(home);
-        });
+        return db.execute("DELETE FROM homes WHERE id=?",[homeId]);
     }  
+
+    static update(homeId, houseName, description, price, location, rating, photoURL){
+        return db.execute(
+            `UPDATE homes
+            SET houseName=?, description=?, price=?, location=?, rating=?, photoURL=?
+            WHERE id=?`,
+            [houseName, description, price, location, rating, photoURL, homeId]
+        );
+    }
 }

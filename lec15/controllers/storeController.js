@@ -3,7 +3,7 @@ const Favourites = require('../models/favourites');
 
 // hostRoute
 exports.getAddHome = (req,res,next) => {
-  Home.fetchAll(homes => {
+  Home.fetchAll().then(([homes]) => {
     res.render('store/home-list',{registeredHomes: homes,pageTitle: 'Add Home to airbnb',currentPage: 'addHome'}); 
   });
 }
@@ -17,8 +17,8 @@ exports.addFavourite = (req, res) => {
   const homeId = req.body.id;
   Favourites.addFavourite(homeId,status => {
     if (status === "already-exists") {
-      Home.fetchAll(homes => {
-        const home = homes.find(h => h.id === homeId);
+      Home.fetchAll().then(([homes]) => {
+        const home = homes.findById(homeId);
 
         return res.render("host/home-details", {
           home: home,

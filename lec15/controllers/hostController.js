@@ -2,44 +2,55 @@ const Home = require('../models/home')
 
 // hostRoute
 exports.getAddHome = (req,res,next) => {
-  Home.fetchAll(homes => {
+  Home.fetchAll().then(([homes]) => {
     res.render('store/home-list',{registeredHomes: homes,pageTitle: 'Add Home to airbnb',currentPage: 'addHome'}); 
   });
 }
 
 exports.editHome = (req,res,next) => {
   const homeId = req.params.homeId;
-  Home.fetchAll(registeredHomes => {
-    const neededHome = registeredHomes.find(h => h.id === homeId);
-    if(!neededHome){
+  Home.findById(homeId).then(([home]) => {
+    console.log("HOME DATA:", home);
+      console.log("FIRST ROW:", home[0]);
+
+    if(home.length === 0){
       console.log("Home Not Found");
-      res.redirect("/");
+      return res.redirect("/");
     }
-    else res.render('host/editHome',{home: neededHome, pageTitle: "EditHome" ,currentPage: "EditHome"});
-  });
+    else {
+      res.render('host/editHome',{home: home[0], pageTitle: "EditHome" ,currentPage: "EditHome"}); 
+    }  
+  }).catch(err => console.log(err));
+  
 }
 
 exports.saveUpdatedHome = (req,res,next) => {
   const homeId = req.params.homeId;
   const {houseName, description, price, location, rating, photoURL} = req.body;
   
-  Home.fetchAll(registeredHomes => {
-    const index = registeredHomes.findIndex(h => h.id === homeId);
-
-    if(index==-1) {
-      return res.redirect("/");
-    }
-    registeredHomes[index] = {...registeredHomes[index],houseName, description, price, location, rating, photoURL};
-    
-    Home.saveAll(registeredHomes);
-  });
-  res.redirect("/");
+  Home.update(
+        homeId,
+        houseName,
+        description,
+        price,
+        location,
+        rating,
+        photoURL
+    )
+    .then(() => {
+        res.redirect("/");
+    })
+    .catch(err => console.log(err));
 }
 
 exports.deleteHome = (req,res,next) => {
   const id = req.params.homeId;
-  Home.delete(id);
-  res.redirect("/");
+  Home.delete(id).then(() => {
+    res.redirect("/");
+  }).catch(err => {
+    console.log(err);
+    res.redirect("/");
+  });
 }
 
 exports.postHome = (req,res,next) => {
@@ -53,7 +64,7 @@ exports.postHome = (req,res,next) => {
 
 //userRoute
 exports.viewHomes = (req,res,next) => {
-  Home.fetchAll(registeredHomes => {
+  Home.fetchAll().then(([registeredHomes]) => {
     res.render('host/home',{registeredHomes: registeredHomes, pageTitle: 'airbnb home', currentPage: 'Home'});
   });
   
@@ -61,15 +72,15 @@ exports.viewHomes = (req,res,next) => {
 
 exports.getHomeDetails = (req,res,next) => {
   const homeId = req.params.homeId;
+  Home.findById(homeId).then(([homes]) => {
+      if (homes.length === 0) {
+        console.log("Home Not Found");
+        return res.redirect("/");
+      }
+      else {
+        const home = homes[0];
+        res.render('host/home-details',{home: home, pageTitle: home.houseName, currentPage: 'HomeDetail'});
+      }
+    }).catch(err => console.log(err));
 
-  Home.fetchAll(registeredHomes => {
-    const selectedHome = registeredHomes.find(home => home.id === homeId);
-    if (!selectedHome) {
-      console.log("Home Not Found");
-      res.redirect("/");
-    }
-    else {
-      res.render('host/home-details',{home: selectedHome, pageTitle: selectedHome.houseName, currentPage: 'HomeDetail'});
-    }
-  });
 }

@@ -10,6 +10,8 @@ const {hostRouter} = require('./routes/hostRoute');
 const routePath = require('./utils/pathUtil');
 const {errorRoute} = require('./controllers/error');
 
+
+
 app.use(express.static(path.join(routePath,'public')));
 
 app.use(express.urlencoded());
