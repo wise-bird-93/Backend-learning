@@ -1,11 +1,13 @@
 const mongo = require("mongodb");
+require('dotenv').config();
+
 const mongoClient = mongo.MongoClient;
 const mongoURL = "mongodb+srv://chatappuser:yuvi1290@cluster0.jsv13mb.mongodb.net/?appName=Cluster0";
 
 let _db;
 
 const mongoConnect = (callback) => {
-  mongoClient.connect(mongoURL).then(client => {
+  mongoClient.connect(process.env.mongoURL).then(client => {
     console.log(client);
     callback();
     _db = client.db("airbnb");
